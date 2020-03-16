@@ -17,8 +17,11 @@ package cmd
 
 import (
 	"fmt"
+	"os"
 
 	"github.com/spf13/cobra"
+
+	"github.com/mangelajo/submariner-release-tools/ghs/pkg/github"
 )
 
 // createMilestonesCmd represents the createMilestones command
@@ -27,6 +30,8 @@ var createMilestonesCmd = &cobra.Command{
 	Short: "This command creates milestones on an a list of organization projects at once",
 	Run: createMilestones,
 }
+
+var projects []string
 
 func init() {
 	rootCmd.AddCommand(createMilestonesCmd)
@@ -40,8 +45,21 @@ func init() {
 	// Cobra supports local flags which will only run when this command
 	// is called directly, e.g.:
 	// createMilestonesCmd.Flags().BoolP("toggle", "t", false, "Help message for toggle")
+	//createMilestonesCmd.PersistentFlags().StringSliceVarP(&projects,"project", "p",[]string{},)
 }
 
 func createMilestones(cmd *cobra.Command, args []string) {
 	fmt.Println("createMilestones called")
+	gh, err := github.NewGitHub()
+	exitOnError(err, "Creating github client")
+	milestone, err := gh.CreateMilestone("submariner-io", "submariner", "0.3.0")
+	exitOnError(err, "Creating milestone")
+	fmt.Printf("Milestone created: %v",milestone)
+}
+
+func exitOnError(err error, indication string) {
+	if err != nil {
+		fmt.Fprintf(os.Stderr, "Error %s: %s\n", indication, err)
+		os.Exit(1)
+	}
 }
