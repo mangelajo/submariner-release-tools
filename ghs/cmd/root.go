@@ -87,7 +87,7 @@ func initConfig() {
 
 func exitOnError(err error, indication string) {
 	if err != nil {
-		fmt.Fprintf(os.Stderr, "Error %s: %s\n", indication, err)
+		fmt.Fprintf(os.Stderr, "💥 %s: %s\n", indication, err)
 		os.Exit(1)
 	}
 }

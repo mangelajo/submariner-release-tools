@@ -51,3 +51,12 @@ func (gh *GitHub) CreateMilestone(owner, repo, milestone string) (*goGithub.Mile
 	item := goGithub.Milestone{Title: &milestone}
 	return gh.client.Issues.CreateMilestone(context.Background(), owner, repo, &item)
 }
+
+func (gh *GitHub) CreateLabel(owner, repo, name, color, description string) (*goGithub.Label, *goGithub.Response, error) {
+	item := goGithub.Label{
+		Name:        &name,
+		Color:       &color,
+		Description: &description}
+
+	return gh.client.Issues.CreateLabel(context.Background(), owner, repo, &item)
+}
