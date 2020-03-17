@@ -13,7 +13,6 @@ func GetGithubToken() string {
 	return os.Getenv("GITHUB_TOKEN")
 }
 
-
 type GitHub struct {
 	client *goGithub.Client
 }
@@ -29,10 +28,10 @@ func NewGitHub() (*GitHub, error) {
 	)
 	tc := oauth2.NewClient(ctx, ts)
 
-	return &GitHub{ client: goGithub.NewClient(tc)} , nil
+	return &GitHub{client: goGithub.NewClient(tc)}, nil
 }
 
-func (gh *GitHub) GetRepositories(owner string) ([] *goGithub.Repository, error) {
+func (gh *GitHub) GetRepositories(owner string) ([]*goGithub.Repository, error) {
 	opt := &goGithub.RepositoryListOptions{
 		ListOptions: goGithub.ListOptions{PerPage: 100}, //TODO: Support more than the max 100 per-page repos
 	}
@@ -40,18 +39,15 @@ func (gh *GitHub) GetRepositories(owner string) ([] *goGithub.Repository, error)
 	return repos, err
 }
 
-func (gh *GitHub) GetMilestones(owner, repo string) ([]*goGithub.Milestone, error) {
+func (gh *GitHub) GetMilestones(owner, repo string) ([]*goGithub.Milestone, *goGithub.Response, error) {
 	opt := &goGithub.MilestoneListOptions{
 		ListOptions: goGithub.ListOptions{PerPage: 100}, //TODO: Support more than the max 100 per-page repos
 	}
-	milestones, _, err := gh.client.Issues.ListMilestones(context.Background(), owner, repo, opt)
+	return gh.client.Issues.ListMilestones(context.Background(), owner, repo, opt)
 
-	return milestones, err
 }
 
-func (gh *GitHub) CreateMilestone(owner, repo, milestone string) (*goGithub.Milestone, error) {
+func (gh *GitHub) CreateMilestone(owner, repo, milestone string) (*goGithub.Milestone, *goGithub.Response, error) {
 	item := goGithub.Milestone{Title: &milestone}
-	milestoneObj, _, err := gh.client.Issues.CreateMilestone(context.Background(), owner, repo, &item)
-
-	return milestoneObj, err
+	return gh.client.Issues.CreateMilestone(context.Background(), owner, repo, &item)
 }

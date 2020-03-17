@@ -28,38 +28,33 @@ import (
 var createMilestonesCmd = &cobra.Command{
 	Use:   "create-milestones",
 	Short: "This command creates milestones on an a list of organization projects at once",
-	Run: createMilestones,
+	Run:   createMilestones,
+	Args:  cobra.MinimumNArgs(1),
 }
-
-var projects []string
 
 func init() {
 	rootCmd.AddCommand(createMilestonesCmd)
-
-	// Here you will define your flags and configuration settings.
-
-	// Cobra supports Persistent Flags which will work for this command
-	// and all subcommands, e.g.:
-	// createMilestonesCmd.PersistentFlags().String("foo", "", "A help for foo")
-
-	// Cobra supports local flags which will only run when this command
-	// is called directly, e.g.:
-	// createMilestonesCmd.Flags().BoolP("toggle", "t", false, "Help message for toggle")
-	//createMilestonesCmd.PersistentFlags().StringSliceVarP(&projects,"project", "p",[]string{},)
 }
 
 func createMilestones(cmd *cobra.Command, args []string) {
-	fmt.Println("createMilestones called")
+
+	milestoneTitle := args[0]
+	fmt.Printf("Creating milestone %s for repos: %v in org: %s\n", milestoneTitle, reposParameter, ownerParameter)
 	gh, err := github.NewGitHub()
 	exitOnError(err, "Creating github client")
-	milestone, err := gh.CreateMilestone("submariner-io", "submariner", "0.3.0")
-	exitOnError(err, "Creating milestone")
-	fmt.Printf("Milestone created: %v",milestone)
-}
 
-func exitOnError(err error, indication string) {
-	if err != nil {
-		fmt.Fprintf(os.Stderr, "Error %s: %s\n", indication, err)
-		os.Exit(1)
+	for _, repo := range reposParameter {
+		_, _, err := gh.CreateMilestone(ownerParameter, repo, milestoneTitle)
+
+		if err != nil {
+			if github.IsAlreadyExistError(err) {
+				fmt.Printf(" ✓ exists for project: %q\n", repo)
+			} else {
+				fmt.Fprintf(os.Stderr, " ✘ failed for %q: %s\n", repo, err)
+				os.Exit(1)
+			}
+		} else {
+			fmt.Printf(" ✔ created for project: %q\n", repo)
+		}
 	}
 }

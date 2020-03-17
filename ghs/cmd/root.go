@@ -17,8 +17,9 @@ package cmd
 
 import (
 	"fmt"
-	"github.com/spf13/cobra"
 	"os"
+
+	"github.com/spf13/cobra"
 
 	homedir "github.com/mitchellh/go-homedir"
 	"github.com/spf13/viper"
@@ -44,9 +45,18 @@ func Execute() {
 	}
 }
 
+var reposParameter []string
+var ownerParameter string
+
 func init() {
 	cobra.OnInitialize(initConfig)
 	rootCmd.PersistentFlags().StringVar(&cfgFile, "config", "", "config file (default is $HOME/.ghs.yaml)")
+
+	rootCmd.PersistentFlags().StringSliceVarP(&reposParameter, "repos", "r", []string{},
+		"The repository names you want to be handled")
+	rootCmd.PersistentFlags().StringVarP(&ownerParameter, "owner", "o", "",
+		"The repository owner/organization where the repositories live")
+
 }
 
 // initConfig reads in config file and ENV variables if set.
@@ -72,5 +82,12 @@ func initConfig() {
 	// If a config file is found, read it in.
 	if err := viper.ReadInConfig(); err == nil {
 		fmt.Println("Using config file:", viper.ConfigFileUsed())
+	}
+}
+
+func exitOnError(err error, indication string) {
+	if err != nil {
+		fmt.Fprintf(os.Stderr, "Error %s: %s\n", indication, err)
+		os.Exit(1)
 	}
 }
