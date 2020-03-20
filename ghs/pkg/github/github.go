@@ -5,7 +5,7 @@ import (
 	"fmt"
 	"os"
 
-	goGithub "github.com/google/go-github/v29/github"
+	goGithub "github.com/google/go-github/v30/github"
 	"golang.org/x/oauth2"
 )
 
@@ -29,34 +29,4 @@ func NewGitHub() (*GitHub, error) {
 	tc := oauth2.NewClient(ctx, ts)
 
 	return &GitHub{client: goGithub.NewClient(tc)}, nil
-}
-
-func (gh *GitHub) GetRepositories(owner string) ([]*goGithub.Repository, error) {
-	opt := &goGithub.RepositoryListOptions{
-		ListOptions: goGithub.ListOptions{PerPage: 100}, //TODO: Support more than the max 100 per-page repos
-	}
-	repos, _, err := gh.client.Repositories.List(context.Background(), owner, opt)
-	return repos, err
-}
-
-func (gh *GitHub) GetMilestones(owner, repo string) ([]*goGithub.Milestone, *goGithub.Response, error) {
-	opt := &goGithub.MilestoneListOptions{
-		ListOptions: goGithub.ListOptions{PerPage: 100}, //TODO: Support more than the max 100 per-page repos
-	}
-	return gh.client.Issues.ListMilestones(context.Background(), owner, repo, opt)
-
-}
-
-func (gh *GitHub) CreateMilestone(owner, repo, milestone string) (*goGithub.Milestone, *goGithub.Response, error) {
-	item := goGithub.Milestone{Title: &milestone}
-	return gh.client.Issues.CreateMilestone(context.Background(), owner, repo, &item)
-}
-
-func (gh *GitHub) CreateLabel(owner, repo, name, color, description string) (*goGithub.Label, *goGithub.Response, error) {
-	item := goGithub.Label{
-		Name:        &name,
-		Color:       &color,
-		Description: &description}
-
-	return gh.client.Issues.CreateLabel(context.Background(), owner, repo, &item)
 }

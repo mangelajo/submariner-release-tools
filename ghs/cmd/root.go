@@ -23,6 +23,8 @@ import (
 
 	homedir "github.com/mitchellh/go-homedir"
 	"github.com/spf13/viper"
+
+	"github.com/mangelajo/submariner-release-tools/ghs/pkg/github"
 )
 
 var cfgFile string
@@ -54,7 +56,7 @@ func init() {
 
 	rootCmd.PersistentFlags().StringSliceVarP(&reposParameter, "repos", "r", []string{},
 		"The repository names you want to be handled")
-	rootCmd.PersistentFlags().StringVarP(&ownerParameter, "owner", "o", "",
+	rootCmd.PersistentFlags().StringVarP(&ownerParameter, "owner", "o", "submariner-io",
 		"The repository owner/organization where the repositories live")
 
 }
@@ -90,4 +92,10 @@ func exitOnError(err error, indication string) {
 		fmt.Fprintf(os.Stderr, "💥 %s: %s\n", indication, err)
 		os.Exit(1)
 	}
+}
+
+func githubClient() *github.GitHub {
+	gh, err := github.NewGitHub()
+	exitOnError(err, "Creating github client")
+	return gh
 }
