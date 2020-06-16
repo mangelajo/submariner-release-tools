@@ -1,0 +1,12 @@
+#!/bin/bash
+
+PROJECTS="-r submariner -r enhancements -r submariner-bot -r lighthouse -r coastguard -r shipyard -r submariner-charts -r submariner-operator -r submariner-website -r admiral"
+
+source ./token
+
+./ghs create-milestones 0.4.0 $PROJECTS
+./ghs create-milestones 0.5.0 $PROJECTS
+./ghs create-labels website "fbca04" $PROJECTS
+./ghs create-labels globalnet "34ba5c" $PROJECTS
+./ghs create-labels automation "f450bb" $PROJECTS
+./ghs create-labels cncf "d32bd8" $PROJECTS
